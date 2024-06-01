@@ -33,7 +33,7 @@ def cleanup_email(raw):
     to = message.get("To")
     frm = message.get("From")
     sub = message.get("Subject")
-    body = raw.decode(errors='ignore') # default case
+    body = raw.decode(errors="ignore")  # default case
     ctype = message.get("Content-Type")
 
     # if it is multipart, get only the texts
@@ -45,9 +45,9 @@ def cleanup_email(raw):
                 body = part.get_payload().strip()
                 break
     elif ctype.startswith("text/plain"):
-        body = "plain text:\n" + body
+        body = "plain text:\n" + message.get_payload()
     elif ctype.startswith("text/html"):
-        body = html.unescape(body)
+        body = html.unescape(message.get_payload())
         body = re.sub("<.*?>", "", body)
         body = "html text:\n" + body
 
