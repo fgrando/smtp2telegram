@@ -44,9 +44,9 @@ def cleanup_email(raw):
             if ctype == "text/plain" and "attachment" not in cdispo:
                 body = part.get_payload().strip()
                 break
-    elif ctype.startswith("text/plain"):
+    elif ctype != None and ctype.startswith("text/plain"):
         body = "plain text:\n" + message.get_payload()
-    elif ctype.startswith("text/html"):
+    elif ctype != None and ctype.startswith("text/html"):
         body = html.unescape(message.get_payload())
         body = re.sub("<.*?>", "", body)
         body = "html text:\n" + body
