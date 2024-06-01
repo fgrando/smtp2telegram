@@ -33,7 +33,7 @@ def cleanup_email(raw):
     to = message.get("To")
     frm = message.get("From")
     sub = message.get("Subject")
-    body = message.get_payload()  # default case
+    body = raw.decode(errors='ignore') # default case
     ctype = message.get("Content-Type")
 
     # if it is multipart, get only the texts
@@ -51,7 +51,7 @@ def cleanup_email(raw):
         body = re.sub("<.*?>", "", body)
         body = "html text:\n" + body
 
-    return f"{frm}\n{to}\n{sub}\n{body}"
+    return f"{frm} -> {to}\n{sub}\n\n{body}"
 
 
 # Telegram message
