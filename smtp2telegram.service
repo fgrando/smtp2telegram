@@ -1,0 +1,8 @@
+[Unit]
+Description=SMTP server bridge to Telegram
+
+[Service]
+ExecStart=/usr/bin/smtp2telegram.py
+
+[Install]
+WantedBy=multi-user.target
