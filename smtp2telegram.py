@@ -32,9 +32,16 @@ def cleanup_email(raw):
 
     to = message.get("To")
     frm = message.get("From")
-    sub = message.get("Subject")
-    body = raw.decode(errors="ignore")  # default case
+    sub = message.get("Subject").strip()
+    date = message.get("Date")
     ctype = message.get("Content-Type")
+
+    # by default consider body everything that is not mapped to keys
+    body = raw.decode(errors="ignore").strip()
+    for k in message.keys():
+        print(k, message.get(k))
+        body = body.replace(f"{k}: {message.get(k)}", "").strip()
+    body = "raw payload:\n" + body
 
     # if it is multipart, get only the texts
     if message.is_multipart():
@@ -51,7 +58,10 @@ def cleanup_email(raw):
         body = re.sub("<.*?>", "", body)
         body = "html text:\n" + body
 
-    return f"{frm} -> {to}\n{sub}\n\n{body}"
+    # limit length of body
+    if len(body) > 240:
+        body = body[:240]
+    return f"{frm} -> {to}\n{date}\n{sub}\n\n{body}"
 
 
 # Telegram message
