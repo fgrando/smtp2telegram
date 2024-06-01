@@ -2,6 +2,7 @@
 
 import re
 import sys
+import email
 import subprocess
 import asyncore
 from smtpd import SMTPServer
@@ -24,6 +25,24 @@ def get_linux_ipv4():
     return ips
 
 
+# cleanup email message
+def cleanup_email(raw):
+    message = email.message_from_bytes(raw)
+    to = message.get("To")
+    frm = message.get("From")
+    sub = message.get("Subject")
+    body = message.get_payload()
+    # if it is multipart, get only the texts
+    if message.is_multipart():
+        for part in message.walk():
+            ctype = part.get_content_type()
+            cdispo = str(part.get("Content-Disposition"))
+            if ctype == "text/plain" and "attachment" not in cdispo:
+                body = part.get_payload().strip()
+                break
+    return f"{frm}\n{to}\n{sub}\n{body}"
+
+
 # Telegram message
 def send_message(msg):
     import asyncio
@@ -38,7 +57,7 @@ class EmlServer(SMTPServer):
         self, peer, mailfrom, rcpttos, data, mail_options=None, rcpt_options=None
     ):
         bot = telegram.Bot(token=TELEGRAM_TOKEN)
-        message = data.decode(errors="ignore")
+        message = cleanup_email(data)
         send_message(message)
 
 
