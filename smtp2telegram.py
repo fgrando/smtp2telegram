@@ -2,6 +2,7 @@
 
 import re
 import sys
+import html
 import email
 import subprocess
 import asyncore
@@ -28,10 +29,13 @@ def get_linux_ipv4():
 # cleanup email message
 def cleanup_email(raw):
     message = email.message_from_bytes(raw)
+
     to = message.get("To")
     frm = message.get("From")
     sub = message.get("Subject")
-    body = raw.decode(errors='ignore')
+    body = message.get_payload()  # default case
+    ctype = message.get("Content-Type")
+
     # if it is multipart, get only the texts
     if message.is_multipart():
         for part in message.walk():
@@ -40,6 +44,13 @@ def cleanup_email(raw):
             if ctype == "text/plain" and "attachment" not in cdispo:
                 body = part.get_payload().strip()
                 break
+    elif ctype.startswith("text/plain"):
+        body = "plain text:\n" + body
+    elif ctype.startswith("text/html"):
+        body = html.unescape(body)
+        body = re.sub("<.*?>", "", body)
+        body = "html text:\n" + body
+
     return f"{frm}\n{to}\n{sub}\n{body}"
 
 
