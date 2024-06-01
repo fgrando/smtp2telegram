@@ -39,7 +39,6 @@ def cleanup_email(raw):
     # by default consider body everything that is not mapped to keys
     body = raw.decode(errors="ignore").strip()
     for k in message.keys():
-        print(k, message.get(k))
         body = body.replace(f"{k}: {message.get(k)}", "").strip()
     body = "raw payload:\n" + body
 
