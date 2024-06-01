@@ -31,7 +31,7 @@ def cleanup_email(raw):
     to = message.get("To")
     frm = message.get("From")
     sub = message.get("Subject")
-    body = message.get_payload()
+    body = raw.decode(errors='ignore')
     # if it is multipart, get only the texts
     if message.is_multipart():
         for part in message.walk():
