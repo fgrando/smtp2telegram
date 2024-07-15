@@ -1,5 +1,6 @@
 #!/bin/python3
 
+import os
 import re
 import sys
 import html
@@ -11,8 +12,11 @@ import telegram
 
 # Definitions
 SMTP_SERVER_PORT = 1025
-TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
-TELEGRAM_CHAT_ID = 000000000
+
+# The .cred file contains the following variables
+#TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
+#TELEGRAM_CHAT_ID = 000000000
+from mycredencials import *
 
 
 # get interface ip
