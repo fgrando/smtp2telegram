@@ -30,3 +30,9 @@ SMTP will be serving at the provided/found IP and port `1025`.No authentication 
 Edit the following variables inside the script to provide telegram bot id and chat id:
 - TELEGRAM_TOKEN = `"0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"`
 - TELEGRAM_CHAT_ID = `000000000`
+
+## Example
+- login message:
+
+	/usr/bin/smtpnotify "$(hostname) new login $(w)" "$(hostname)"
+
