@@ -7,19 +7,19 @@ import html
 import email
 import subprocess
 import asyncio
-from smtpd import SMTPServer
+from aiosmtpd.controller import Controller
 import telegram
 
 # Definitions
 SMTP_SERVER_PORT = 1025
 
-# The credentials file contains the following variables
+# The .cred file contains the following variables
 # TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
 # TELEGRAM_CHAT_ID = 000000000
 from mycredentials import *
 
 
-# get interface ip
+# Get interface IP
 def get_linux_ipv4():
     ips = []
     dump = subprocess.check_output(["ip", "addr"]).decode(errors="ignore")
@@ -30,7 +30,7 @@ def get_linux_ipv4():
     return ips
 
 
-# cleanup email message
+# Cleanup email message
 def cleanup_email(raw):
     message = email.message_from_bytes(raw)
 
@@ -40,13 +40,13 @@ def cleanup_email(raw):
     date = message.get("Date")
     ctype = message.get("Content-Type")
 
-    # by default consider body everything that is not mapped to keys
+    # By default consider body everything that is not mapped to keys
     body = raw.decode(errors="ignore").strip()
     for k in message.keys():
         body = body.replace(f"{k}: {message.get(k)}", "").strip()
     body = "raw payload:\n" + body
 
-    # if it is multipart, get only the texts
+    # If it is multipart, get only the texts
     if message.is_multipart():
         for part in message.walk():
             ctype = part.get_content_type()
@@ -54,14 +54,14 @@ def cleanup_email(raw):
             if ctype == "text/plain" and "attachment" not in cdispo:
                 body = part.get_payload().strip()
                 break
-    elif ctype != None and ctype.startswith("text/plain"):
+    elif ctype is not None and ctype.startswith("text/plain"):
         body = "plain text:\n" + message.get_payload()
-    elif ctype != None and ctype.startswith("text/html"):
+    elif ctype is not None and ctype.startswith("text/html"):
         body = html.unescape(message.get_payload())
         body = re.sub("<.*?>", "", body)
         body = "html text:\n" + body
 
-    # limit length of body
+    # Limit length of body
     if len(body) > 1240:
         body = body[:1000]
     return f"{frm} -> {to}\n{date}\n{sub}\n\n{body}"
@@ -73,31 +73,37 @@ async def send_message(msg):
     await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg)
 
 
-# SMTP server
-class EmlServer(SMTPServer):
-    def process_message(
-        self, peer, mailfrom, rcpttos, data, mail_options=None, rcpt_options=None
-    ):
-        message = cleanup_email(data)
-        # Call send_message asynchronously using asyncio
-        asyncio.create_task(send_message(message))
+# SMTP handler class
+class MyHandler:
+    async def handle_DATA(self, server, session, envelope):
+        message = cleanup_email(envelope.content)
+        # Send the message asynchronously
+        await send_message(message)
+        return "250 Message accepted for delivery"
 
 
+# Running the SMTP server
 async def run(ip, port):
     print(f"{sys.argv[0]} serving at {ip}:{port}")
-    srv = EmlServer((ip, port), None)
+
+    handler = MyHandler()
+    controller = Controller(handler, hostname=ip, port=port)
+    controller.start()
+
     try:
-        # Use asyncio loop to run the server
+        # Run the event loop indefinitely
         while True:
-            await asyncio.sleep(3600)  # Run the server indefinitely
+            await asyncio.sleep(3600)  # Keep server running
     except KeyboardInterrupt:
         pass
+    finally:
+        controller.stop()
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         server_ip = sys.argv[1]
     else:
-        print("finding interface ip...")
+        print("Finding interface IP...")
         server_ip = get_linux_ipv4()[0]
     asyncio.run(run(server_ip, SMTP_SERVER_PORT))
