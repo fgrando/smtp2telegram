@@ -6,7 +6,7 @@ import sys
 import html
 import email
 import subprocess
-import asyncio
+import asyncio  # Correct import for asyncio
 from aiosmtpd.controller import Controller
 import telegram
 
@@ -14,8 +14,8 @@ import telegram
 SMTP_SERVER_PORT = 1025
 
 # The .cred file contains the following variables
-# TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
-# TELEGRAM_CHAT_ID = 000000000
+#TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
+#TELEGRAM_CHAT_ID = 000000000
 from mycredentials import *
 
 
@@ -93,7 +93,7 @@ async def run(ip, port):
     try:
         # Run the event loop indefinitely
         while True:
-            await asyncio.sleep(3600)  # Keep server running
+            await asyncio.sleep(5)  # Keep server running
     except KeyboardInterrupt:
         pass
     finally:
