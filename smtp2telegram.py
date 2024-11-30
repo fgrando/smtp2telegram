@@ -14,8 +14,8 @@ import telegram
 SMTP_SERVER_PORT = 1025
 
 # The credentials file contains the following variables
-#TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
-#TELEGRAM_CHAT_ID = 000000000
+# TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
+# TELEGRAM_CHAT_ID = 000000000
 from mycredentials import *
 
 
@@ -62,7 +62,7 @@ def cleanup_email(raw):
         body = "html text:\n" + body
 
     # limit length of body
-    if len(body) > 240:
+    if len(body) > 1240:
         body = body[:1000]
     return f"{frm} -> {to}\n{date}\n{sub}\n\n{body}"
 
@@ -75,7 +75,9 @@ async def send_message(msg):
 
 # SMTP server
 class EmlServer(SMTPServer):
-    def process_message(self, peer, mailfrom, rcpttos, data, mail_options=None, rcpt_options=None):
+    def process_message(
+        self, peer, mailfrom, rcpttos, data, mail_options=None, rcpt_options=None
+    ):
         message = cleanup_email(data)
         # Call send_message asynchronously using asyncio
         asyncio.create_task(send_message(message))

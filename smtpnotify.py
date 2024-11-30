@@ -5,9 +5,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-SMTP_SERVER = 'server.addr.com'
+SMTP_SERVER = "server.addr.com"
 SMTP_PORT = 1025
-DEFAULT_DST= "destination@server.com"
+DEFAULT_DST = "destination@server.com"
+
 
 def get_message(email_from, email_to, message):
     msg = MIMEMultipart("alternative")
