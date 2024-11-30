@@ -6,17 +6,17 @@ import sys
 import html
 import email
 import subprocess
-import asyncore
+import asyncio
 from smtpd import SMTPServer
 import telegram
 
 # Definitions
 SMTP_SERVER_PORT = 1025
 
-# The .cred file contains the following variables
+# The credentials file contains the following variables
 #TELEGRAM_TOKEN = "0000000000:AAaaaAaAAAAAAAAAAAAA-AAAaaaaaaaaAAA"
 #TELEGRAM_CHAT_ID = 000000000
-from mycredencials import *
+from mycredentials import *
 
 
 # get interface ip
@@ -63,33 +63,31 @@ def cleanup_email(raw):
 
     # limit length of body
     if len(body) > 240:
-        body = body[:240]
+        body = body[:1000]
     return f"{frm} -> {to}\n{date}\n{sub}\n\n{body}"
 
 
 # Telegram message
-def send_message(msg):
-    import asyncio
-
+async def send_message(msg):
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
-    asyncio.run(bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg))
+    await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=msg)
 
 
 # SMTP server
 class EmlServer(SMTPServer):
-    def process_message(
-        self, peer, mailfrom, rcpttos, data, mail_options=None, rcpt_options=None
-    ):
-        bot = telegram.Bot(token=TELEGRAM_TOKEN)
+    def process_message(self, peer, mailfrom, rcpttos, data, mail_options=None, rcpt_options=None):
         message = cleanup_email(data)
-        send_message(message)
+        # Call send_message asynchronously using asyncio
+        asyncio.create_task(send_message(message))
 
 
-def run(ip, port):
+async def run(ip, port):
     print(f"{sys.argv[0]} serving at {ip}:{port}")
     srv = EmlServer((ip, port), None)
     try:
-        asyncore.loop()
+        # Use asyncio loop to run the server
+        while True:
+            await asyncio.sleep(3600)  # Run the server indefinitely
     except KeyboardInterrupt:
         pass
 
@@ -100,4 +98,4 @@ if __name__ == "__main__":
     else:
         print("finding interface ip...")
         server_ip = get_linux_ipv4()[0]
-    run(server_ip, SMTP_SERVER_PORT)
+    asyncio.run(run(server_ip, SMTP_SERVER_PORT))
