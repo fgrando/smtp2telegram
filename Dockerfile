@@ -7,7 +7,7 @@ RUN mkdir /app && chown python:python /app
 WORKDIR /app
 RUN apt update 
 RUN apt install -y python3 python3-pip iproute2
-RUN pip install --force-reinstall python-telegram-bot telegram
+RUN pip install --force-reinstall python-telegram-bot
 COPY mycredencials.py .
 COPY smtp2telegram.py .
 

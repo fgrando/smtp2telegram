@@ -2,11 +2,7 @@
 Description=SMTP server bridge to Telegram
 
 [Service]
-ExecStart=/usr/bin/smtp2telegram.py your.ip.ad.dr
-WorkingDirectory=/path/to/credentials/file/dir
-Restart=always
-RestartSet=3
-
+ExecStart=/usr/bin/smtp2telegram
 
 [Install]
 WantedBy=multi-user.target
