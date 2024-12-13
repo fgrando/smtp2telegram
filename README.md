@@ -6,7 +6,9 @@ Simple SMTP bridge to Telegram using python.
 Python 3.x and some pip packages are needed:
 
 	sudo apt install python3-pip
-	pip install --force-reinstall python-telegram-bot telegram
+	pip install --force-reinstall python-telegram-bot
+
+(ensure no other telegram packages are installed)
 
 
 ## Install
