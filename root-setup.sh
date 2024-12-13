@@ -13,3 +13,8 @@ cd $gitdir
 systemctl start smtp2telegram
 systemctl enable smtp2telegram
 systemctl status smtp2telegram
+
+# config your timezone
+# timedatectl list-timezones
+timedatectl set-timezone Europe/Berlin
+timedatectl set-ntp on
