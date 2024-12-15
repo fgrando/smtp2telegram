@@ -1,6 +1,6 @@
 apt update
 apt install git python3-pip
-pip install --force-reinstall python-telegram-bot
+pip install --force-reinstall python-telegram-bot --break-system-packages
 
 gitdir=$(pwd)
 cd /usr/bin/
