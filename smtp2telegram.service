@@ -1,8 +1,13 @@
 [Unit]
 Description=SMTP server bridge to Telegram
+After=network.target
 
 [Service]
+# wait for internet connection to start
+ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
 ExecStart=/usr/bin/smtp2telegram
+RestartSec=5
+Restart=always
 
 [Install]
 WantedBy=multi-user.target
